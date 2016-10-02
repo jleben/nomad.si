@@ -1,0 +1,11 @@
+
+
+p #{question.text}
+
+ul
+  each answer in question.answers
+    li
+      input(type='radio' name='answer' id='answer-'+answer._id)
+      label(for='answer-'+answer._id) #{answer.text}
+
+p: button(type='button') Submit

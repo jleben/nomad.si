@@ -1,0 +1,47 @@
+ 
+[
+  {
+    "_id": 1,
+    "text": "What is your favourite food?",
+    "answers": [
+      {
+        "_id": 1,
+        "text": "mushrooms",
+        "next-question": 2
+      },
+      {
+        "_id": 2,
+        "text": "carrots",
+        "next-question": 3
+      }
+    ]
+  },
+  {
+    "_id": 2,
+    "text": "What is your favourite color?",
+    "answers": [
+      {
+        "_id": 1,
+        "text": "red"
+      },
+      {
+        "_id": 2,
+        "text": "green"
+      }
+    ]
+  },
+  {
+    "_id": 3,
+    "text": "What is your favourite animal?",
+    "answers": [
+      {
+        "_id": 1,
+        "text": "bird"
+      },
+      {
+        "_id": 2,
+        "text": "worm"
+      }
+    ]
+  }
+]
