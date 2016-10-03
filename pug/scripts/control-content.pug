@@ -1,0 +1,12 @@
+ 
+p Current question:
+
+p #{status.question._id}: #{status.question.text}
+
+p Answers:
+
+each answer in status.question.answers
+  ul
+    li
+      p #{answer._id}: #{answer.text} (#{status.answers[answer._id]})
+      p Next: #{answer["next-question"]}
