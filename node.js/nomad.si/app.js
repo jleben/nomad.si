@@ -34,9 +34,12 @@ server.get('/status/current_question_id', function(req, res) {
 server.get('/data/question/current', function(req, res) {
     console.log("Requested current question = " + current_question_id);
     get_question(current_question_id, (err, doc) => {
-      console.log("Doc type:")
-      console.log(doc.constructor.name);
-      res.send(doc);
+      if (doc != null) {
+        console.log("Doc type:")
+        console.log(doc.constructor.name);
+        res.send(doc);
+      }
+      else { res.sendStatus(404); }
     });
 });
 
@@ -44,15 +47,16 @@ server.get('/data/question/:question_id', function(req, res) {
     console.log('Requested question: ' + req.params.question_id);
     var id = parseInt(req.params.question_id);
     get_question(id, (err, doc) => {
-      res.send(doc);
+      if (doc != null) { res.send(doc); }
+      else { res.sendStatus(404); }
     });
 });
 
 server.get('/data/questions', function(req, res) {
   var collection = db.collection('questions');
   collection.find({}).toArray((err, docs) => {
-    assert.equal(err, null);
-    res.send(docs)
+    if (doc != null) { res.send(docs); }
+    else { res.sendStatus(404); }
   });
 });
 
@@ -61,7 +65,7 @@ server.post('/data/answer', body_parser.json(), (req, res) => {
   console.log("Received answer:");
   console.log(data);
   //var collection = db.collection('answers');
-
+  res.sendStatus(200);
 });
 
 var server_port = 3000;
