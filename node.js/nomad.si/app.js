@@ -2,7 +2,7 @@
 var MongoClient = require('mongodb').MongoClient
 var assert = require('assert');
 var express = require('express');
-
+var body_parser = require('body-parser');
 
 // Connection URL
 var db_url = 'mongodb://localhost:27017/nomad-si-test';
@@ -56,7 +56,13 @@ server.get('/data/questions', function(req, res) {
   });
 });
 
+server.post('/data/answer', body_parser.json(), (req, res) => {
+  var data = req.body;
+  console.log("Received answer:");
+  console.log(data);
+  //var collection = db.collection('answers');
 
+});
 
 var server_port = 3000;
 
