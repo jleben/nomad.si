@@ -1,12 +1,12 @@
  
-p Current question:
+h2 #{status.state._id}: #{status.state.title}
 
-p #{status.question._id}: #{status.question.text}
+p Question: #{status.state.question}
 
 p Answers:
 
-each answer in status.question.answers
+each answer in status.state.answers
   ul
     li
       p #{answer._id}: #{answer.text} (#{status.answers[answer._id]})
-      p Next: #{answer["next-question"]}
+      p Next: #{answer.next_state}

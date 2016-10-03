@@ -1,11 +1,11 @@
 
 window.onload = function() {
-  loadQuestion()
+  loadState()
 };
 
-var question_id = -1;
+var state_id = -1;
 
-function loadQuestion() {
+function loadState() {
 
   var http = new XMLHttpRequest();
 
@@ -17,13 +17,13 @@ function loadQuestion() {
           return;
       }
       var data = JSON.parse(http.response);
-      question_id = data._id;
-      var content = userQuestionContentTemplate({question: data});
+      state_id = data._id;
+      var content = userQuestionContentTemplate({state: data});
       var container = document.getElementById('content');
       container.innerHTML = content;
   };
 
-  http.open("GET", "/data/question/current", true);
+  http.open("GET", "/data/state/current", true);
   http.send();
 }
 
@@ -35,7 +35,7 @@ function submitAnswer() {
     return;
   }
 
-  var answer = { user: 0, question: question_id, answer: selection.value };
+  var answer = { user: 0, state: state_id, answer: selection.value };
 
   var http = new XMLHttpRequest();
   http.open("POST", "/data/answer", true);

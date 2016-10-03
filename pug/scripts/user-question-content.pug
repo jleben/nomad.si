@@ -1,9 +1,10 @@
 
+h2 #{state.title}
 
-p #{question.text}
+p #{state.question}
 
 ul
-  each answer in question.answers
+  each answer in state.answers
     li
       input(type='radio' name='answer' id='answer-'+answer._id value=answer._id)
       label(for='answer-'+answer._id) #{answer.text}

@@ -2,23 +2,25 @@
 [
   {
     "_id": 1,
-    "text": "What is your favourite food?",
+    "title": "Alice in foodland",
+    "question": "What should Alice eat?",
     "answers": [
       {
         "_id": 1,
-        "text": "mushrooms",
-        "next-question": 2
+        "text": "laughter cake",
+        "next_state": 2
       },
       {
         "_id": 2,
-        "text": "carrots",
-        "next-question": 3
+        "text": "roasted puzzles",
+        "next_state": 3
       }
     ]
   },
   {
     "_id": 2,
-    "text": "What is your favourite color?",
+    "title": "Alice in colorland",
+    "question": "Which color should Alice wear?",
     "answers": [
       {
         "_id": 1,
@@ -32,15 +34,16 @@
   },
   {
     "_id": 3,
-    "text": "What is your favourite animal?",
+    "title": "Alice in animaland",
+    "question": "Which animal should Alice ride?",
     "answers": [
       {
         "_id": 1,
-        "text": "bird"
+        "text": "eagle"
       },
       {
         "_id": 2,
-        "text": "worm"
+        "text": "ant"
       }
     ]
   }

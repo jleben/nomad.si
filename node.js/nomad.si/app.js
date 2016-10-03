@@ -8,7 +8,7 @@ var body_parser = require('body-parser');
 var file_prefix = '/home/jakob/code/nomad.si/build';
 var server_port = 3000;
 var db_url = 'mongodb://localhost:27017/nomad-si-test';
-var current_question_id = 1;
+var current_state_id = 1;
 
 // Database
 
@@ -28,25 +28,25 @@ var server = express();
 server.use('/static/html', express.static(file_prefix + '/html'));
 server.use('/static/js', express.static(file_prefix + '/js'));
 
-server.get('/status/current_question_id', function(req, res) {
-    res.send("Current question: " + current_question_id);
+server.get('/status/current_state_id', function(req, res) {
+    res.send("Current state: " + current_state_id);
 });
 
 server.get('/status', function(req, res) {
 
-    var question_id = current_question_id;
+    var state_id = current_state_id;
 
     var data = {};
 
-    get_question(question_id)
-      .then(question => {
-          data.question = question;
+    get_state(state_id)
+      .then(state => {
+          data.state = state;
       }, reason => {
-          res.send("Can't get question: " + reason);
+          res.send("Can't get state: " + reason);
       })
       .then(() => {
           console.log("Getting answer stats.");
-          return get_answer_stats(question_id)
+          return get_answer_stats(state_id)
       })
       .then(answer_stats => {
           console.log("Sending status.");
@@ -61,14 +61,14 @@ server.get('/status', function(req, res) {
       });
 });
 
-server.post('/control/current_question', body_parser.json(), (req, res) => {
+server.post('/control/current_state', body_parser.json(), (req, res) => {
   id = req.body.id;
-  current_question_id = id;
+  current_state_id = id;
 });
 
-server.get('/data/question/current', function(req, res) {
-    console.log("Requested current question = " + current_question_id);
-    get_question(current_question_id).then(doc => {
+server.get('/data/state/current', function(req, res) {
+    console.log("Requested current state = " + current_state_id);
+    get_state(current_state_id).then(doc => {
         console.log("Doc type:")
         console.log(doc.constructor.name);
         res.send(doc);
@@ -77,22 +77,19 @@ server.get('/data/question/current', function(req, res) {
     });
 });
 
-server.get('/data/question/:question_id', function(req, res) {
-    console.log('Requested question: ' + req.params.question_id);
-    var id = parseInt(req.params.question_id);
-    get_question(id).then(doc => {
-      res.send(doc);
-    }, err => {
-      res.sendStatus(404);
-    });
+server.get('/data/state/:state_id', function(req, res) {
+    console.log('Requested state: ' + req.params.state_id);
+    var id = parseInt(req.params.state_id);
+    get_state(id)
+      .then(doc => { res.send(doc); },
+            err => { res.sendStatus(404); });
 });
 
-server.get('/data/questions', function(req, res) {
-  var collection = db.collection('questions');
-  collection.find({}).toArray((err, docs) => {
-    if (doc != null) { res.send(docs); }
-    else { res.sendStatus(404); }
-  });
+server.get('/data/states', function(req, res) {
+  var collection = db.collection('states');
+  collection.find({}).toArray()
+  .then(docs  => { res.send(docs); },
+        error => { res.sendStatus(404); });
 });
 
 server.post('/data/answer', body_parser.json(), (req, res) => {
@@ -100,21 +97,21 @@ server.post('/data/answer', body_parser.json(), (req, res) => {
   console.log("Received answer:");
   console.log(data);
   var collection = db.collection('answers');
-  var dbData = { user: data.user, question: data.question, answer: data.answer };
+  var dbData = { user: data.user, state: data.state, answer: data.answer };
   collection.insertOne(dbData, {}, (error, result) => {
     if (result != null) { res.sendStatus(200); }
     else { res.sendStatus(503); }
   });
 });
 
-function get_question(id) {
-    var collection = db.collection('questions');
+function get_state(id) {
+    var collection = db.collection('states');
     return collection.findOne({_id: id}, {});
 }
 
-function get_answer_stats(question_id) {
+function get_answer_stats(state_id) {
     var collection = db.collection('answers');
-    return collection.find({question: question_id}).toArray()
+    return collection.find({state: state_id}).toArray()
       .then(answers => {
           var stats = {};
           answers.forEach((answer) => {
