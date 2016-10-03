@@ -10,3 +10,4 @@ each answer in status.state.answers
     li
       p #{answer._id}: #{answer.text} (#{status.answers[answer._id]})
       p Next: #{answer.next_state}
+        button(type='button' onclick='goToState('+answer.next_state+')') Go

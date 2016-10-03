@@ -62,8 +62,10 @@ server.get('/status', function(req, res) {
 });
 
 server.post('/control/current_state', body_parser.json(), (req, res) => {
+  console.log("Got request for new state:" + req.body.id);
   id = req.body.id;
   current_state_id = id;
+  res.sendStatus(200);
 });
 
 server.get('/data/state/current', function(req, res) {
