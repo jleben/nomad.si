@@ -1,4 +1,8 @@
 
+user_id = sessionStorage.getItem('user_id');
+if (!user_id)
+  window.location = '/static/html/user-login.html'
+
 window.onload = function() {
   loadState()
 };
