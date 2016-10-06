@@ -19,4 +19,4 @@ ul
       label(for='answer-'+answer._id) #{answer.text}
 
 if !is_answered
-  p: button(type='button' onclick='submitAnswer()') Submit
+  p: button#submit_btn(type='button' onclick='submitAnswer()') Submit

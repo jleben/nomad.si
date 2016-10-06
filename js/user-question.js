@@ -43,13 +43,17 @@ function submitAnswer() {
 
   console.log("State = " + state_id);
 
+  button = document.getElementById('submit_btn');
+  button.disabled = true;
+
   var answer = { user: user_id, state: state_id, answer: selection.value };
 
   var http = new XMLHttpRequest();
   http.open("POST", "/data/answer", true);
-  console.log("Sending: " + JSON.stringify(answer));
   http.setRequestHeader("Content-Type", "application/json");
   http.send(JSON.stringify(answer));
+
+  loadState();
 }
 
 function onHttpSuccess(http, f) {
