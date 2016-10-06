@@ -131,18 +131,20 @@ server.post('/data/answer', body_parser.json(), (req, res) => {
     var msg = "Decision not enabled!";
     console.log(msg);
     res.status(404).send(msg);
+    return;
   }
 
   if (data.state != current_state_id) {
     msg = "Answer does not match current state.";
     res.status(404).send(msg);
+    return;
   }
 
 
   var collection = db.collection('answers');
   var query = { user: data.user, state: data.state };
   var insertion = { user: data.user, state: data.state, answer: data.answer };
-  collection.update(query, insertion)
+  collection.update(query, insertion, { upsert: true })
     .then(() => {
       res.sendStatus(200);
     })
