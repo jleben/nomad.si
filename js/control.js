@@ -1,11 +1,12 @@
  
 window.onload = function() {
-  update();
+  updateStatus();
+  loadStateList();
 };
 
 var current_state_id = undefined;
 
-function update()
+function updateStatus()
 {
   var http = new XMLHttpRequest();
   http.onreadystatechange = function() {
@@ -20,16 +21,34 @@ function update()
 
       current_state_id = data.state._id;
 
-      display(data);
+      displayStatus(data);
   };
   http.open('GET', '/status', true);
   http.send();
 }
 
-function display(status) {
+function displayStatus(status) {
   console.log("Displaying: " + status);
   var content = controlContentTemplate({ status: status });
   var container = document.getElementById('content');
+  container.innerHTML = content;
+}
+
+function loadStateList() {
+  var http = new XMLHttpRequest();
+  http.onreadystatechange = function() {
+      if (http.readyState != 4) return;
+      if (http.status != 200) return;
+      var states = JSON.parse(http.response);
+      displayStateList(states);
+  };
+  http.open('GET', '/data/states', true);
+  http.send();
+}
+
+function displayStateList(states) {
+  var content = controlStateListTemplate({ states: states });
+  var container = document.getElementById('state_list');
   container.innerHTML = content;
 }
 
@@ -44,7 +63,7 @@ function setDecisionEnabled(enabled) {
   http.setRequestHeader("Content-Type", "application/json");
   http.send(JSON.stringify(data));
 
-  update();
+  updateStatus();
 }
 
 function goToState(id) {
@@ -59,7 +78,7 @@ function goToState(id) {
           return;
       }
       if (http.status == 200) {
-        update();
+        updateStatus();
       } else {
         var status = document.getElementById('status');
         status.textContent = "An error occurred: " + http.status;

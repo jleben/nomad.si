@@ -1,0 +1,9 @@
+ 
+h2 Poglavja:
+
+button(onclick='loadStateList()') Osveži
+
+each state in states
+  ul
+    li #{state._id}: #{state.title}
+      button(onclick='goToState('+state._id+')') Pojdi

@@ -119,7 +119,7 @@ server.get('/data/states', function(req, res) {
   var collection = db.collection('states');
   collection.find({}).toArray()
   .then(docs  => { res.send(docs); },
-        error => { res.sendStatus(404); });
+        error => { res.sendStatus(503); });
 });
 
 server.post('/data/answer', body_parser.json(), (req, res) => {

@@ -1,4 +1,6 @@
- 
+
+p Trenutno poglavje:
+
 h2 #{status.state._id}: #{status.state.title}
 
 if status.decision_enabled
@@ -21,5 +23,9 @@ each answer in status.state.answers
         if (answer_count == undefined)
           answer_count = 0;
       p #{answer._id}: #{answer.text} (#{answer_count})
-      p Next: #{answer.next_state}
-        button(type='button' onclick='goToState('+answer.next_state+')') Go
+
+      if answer.next_state != undefined
+        p Naslednje poglavje: #{answer.next_state}
+          button(type='button' onclick='goToState('+answer.next_state+')') Pojdi
+      else
+        p Ni sledečega poglavja.
