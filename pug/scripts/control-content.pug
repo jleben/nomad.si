@@ -1,6 +1,14 @@
  
 h2 #{status.state._id}: #{status.state.title}
 
+if status.decision_enabled
+  p Odločitev publike je aktivna.
+  button(onClick='setDecisionEnabled(false)') Deaktiviraj.
+else
+  p Odločitev publike ni aktivna.
+  button(onClick='setDecisionEnabled(true)') Aktiviraj.
+
+
 p Question: #{status.state.question}
 
 p Answers:
@@ -8,6 +16,10 @@ p Answers:
 each answer in status.state.answers
   ul
     li
-      p #{answer._id}: #{answer.text} (#{status.answers[answer._id]})
+      -
+        answer_count = status.answers[answer._id];
+        if (answer_count == undefined)
+          answer_count = 0;
+      p #{answer._id}: #{answer.text} (#{answer_count})
       p Next: #{answer.next_state}
         button(type='button' onclick='goToState('+answer.next_state+')') Go

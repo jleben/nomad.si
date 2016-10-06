@@ -3,6 +3,8 @@ window.onload = function() {
   update();
 };
 
+var current_state_id = undefined;
+
 function update()
 {
   var http = new XMLHttpRequest();
@@ -13,7 +15,11 @@ function update()
       if (http.status != 200) {
           return;
       }
+
       var data = JSON.parse(http.response);
+
+      current_state_id = data.state._id;
+
       display(data);
   };
   http.open('GET', '/status', true);
@@ -27,10 +33,24 @@ function display(status) {
   container.innerHTML = content;
 }
 
+function setDecisionEnabled(enabled) {
+  if (!current_state_id)
+    return;
+
+  data = { state_id: current_state_id, decision_enabled: enabled };
+
+  var http = new XMLHttpRequest();
+  http.open('POST', '/control/current_state', true);
+  http.setRequestHeader("Content-Type", "application/json");
+  http.send(JSON.stringify(data));
+
+  update();
+}
+
 function goToState(id) {
   console.log("Requesting new state: " + id);
 
-  var data = { id: id }
+  var data = { state_id: id }
 
   var http = new XMLHttpRequest();
 

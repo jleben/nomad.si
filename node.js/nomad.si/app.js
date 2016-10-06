@@ -8,7 +8,9 @@ var body_parser = require('body-parser');
 var file_prefix = '/home/jakob/code/nomad.si/build';
 var server_port = 3000;
 var db_url = 'mongodb://localhost:27017/nomad-si-test';
+
 var current_state_id = 1;
+var decision_enabled = false;
 
 // Database
 
@@ -43,7 +45,7 @@ server.get('/status', function(req, res) {
       get_answer_stats(state_id)
     ])
     .then(values => {
-      data = { state: values[0], answers: values[1] };
+      data = { state: values[0], answers: values[1], decision_enabled: decision_enabled };
       res.send(data);
     })
     .catch(err => {
@@ -53,8 +55,20 @@ server.get('/status', function(req, res) {
 });
 
 server.post('/control/current_state', body_parser.json(), (req, res) => {
-  console.log("Got request for new state:" + req.body.id);
-  current_state_id = req.body.id;
+  var data = req.body;
+
+  console.log("Got request for current state: " + data);
+
+  if (data.state_id == undefined)
+    res.status(400).send("Requested state id is undefined.");
+
+  current_state_id = data.state_id;
+
+  if (data.decision_enabled == true)
+    decision_enabled = true;
+  else
+    decision_enabled = false;
+
   res.sendStatus(200);
 });
 
@@ -82,6 +96,7 @@ server.get('/data/state/current', function(req, res) {
     .then(values => {
       var data = {};
       data.state = values[0];
+      data.decision_enabled = decision_enabled;
       if (values[1])
         data.selected_answer = values[1].answer;
       res.send(data);
@@ -111,6 +126,19 @@ server.post('/data/answer', body_parser.json(), (req, res) => {
   var data = req.body;
   console.log("Received answer:");
   console.log(data);
+
+  if (!decision_enabled) {
+    var msg = "Decision not enabled!";
+    console.log(msg);
+    res.status(404).send(msg);
+  }
+
+  if (data.state != current_state_id) {
+    msg = "Answer does not match current state.";
+    res.status(404).send(msg);
+  }
+
+
   var collection = db.collection('answers');
   var dbData = { user: data.user, state: data.state, answer: data.answer };
   collection.insertOne(dbData)
@@ -147,8 +175,7 @@ function get_answer_stats(state_id) {
               var count = stats[id];
               if (count == undefined)
                 count = 0;
-              else
-                ++count;
+              ++count;
               stats[id] = count;
           });
           return stats;
