@@ -140,8 +140,9 @@ server.post('/data/answer', body_parser.json(), (req, res) => {
 
 
   var collection = db.collection('answers');
-  var dbData = { user: data.user, state: data.state, answer: data.answer };
-  collection.insertOne(dbData)
+  var query = { user: data.user, state: data.state };
+  var insertion = { user: data.user, state: data.state, answer: data.answer };
+  collection.update(query, insertion)
     .then(() => {
       res.sendStatus(200);
     })

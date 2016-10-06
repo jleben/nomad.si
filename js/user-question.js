@@ -46,17 +46,12 @@ function submitAnswer() {
 
   console.log("State = " + state_id);
 
-  button = document.getElementById('submit_btn');
-  button.disabled = true;
-
   var answer = { user: user_id, state: state_id, answer: selection.value };
 
   var http = new XMLHttpRequest();
   http.open("POST", "/data/answer", true);
   http.setRequestHeader("Content-Type", "application/json");
   http.send(JSON.stringify(answer));
-
-  loadState();
 }
 
 function logOut() {

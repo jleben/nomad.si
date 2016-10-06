@@ -7,10 +7,7 @@ if decision_enabled
 
   - var is_answered = selected_answer != undefined;
 
-  if is_answered
-      p Čas je za tvojo odločitev:
-  else
-      p Tvoja odločitev je bila:
+  p Čas je za tvojo odločitev:
 
   p #{state.question}
 
@@ -22,13 +19,11 @@ if decision_enabled
           name='answer'
           id='answer-'+answer._id
           value=answer._id
-          disabled=is_answered
           checked=is_answered && answer._id == selected_answer
         )
         label(for='answer-'+answer._id) #{answer.text}
 
-  if !is_answered
-    p: button#submit_btn(type='button' onclick='submitAnswer()') Pošlji odločitev
+  p: button#submit_btn(type='button' onclick='submitAnswer()') Pošlji odločitev
 
 else
 
