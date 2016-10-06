@@ -21,13 +21,15 @@ function loadState() {
           return;
       }
       var data = JSON.parse(http.response);
-      state_id = data._id;
-      var content = userQuestionContentTemplate({state: data});
+      state_id = data.state._id;
+      console.log("State = " + state_id);
+      console.log("Selected answer = " + data.selected_answer);
+      var content = userQuestionContentTemplate(data);
       var container = document.getElementById('content');
       container.innerHTML = content;
   };
 
-  http.open("GET", "/data/state/current", true);
+  http.open("GET", "/data/state/current?user_id="+user_id, true);
   http.send();
 }
 
@@ -39,7 +41,9 @@ function submitAnswer() {
     return;
   }
 
-  var answer = { user: 0, state: state_id, answer: selection.value };
+  console.log("State = " + state_id);
+
+  var answer = { user: user_id, state: state_id, answer: selection.value };
 
   var http = new XMLHttpRequest();
   http.open("POST", "/data/answer", true);

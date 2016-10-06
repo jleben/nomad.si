@@ -3,8 +3,20 @@ h2 #{state.title}
 
 p #{state.question}
 
+- var is_answered = selected_answer != undefined;
+
 ul
   each answer in state.answers
     li
-      input(type='radio' name='answer' id='answer-'+answer._id value=answer._id)
+      input(
+        type='radio'
+        name='answer'
+        id='answer-'+answer._id
+        value=answer._id
+        disabled=is_answered
+        checked=is_answered && answer._id == selected_answer
+      )
       label(for='answer-'+answer._id) #{answer.text}
+
+if !is_answered
+  p: button(type='button' onclick='submitAnswer()') Submit

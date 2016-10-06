@@ -36,46 +36,59 @@ server.get('/status', function(req, res) {
 
     var state_id = current_state_id;
 
-    var data = {};
+    console.log("Requested status. Current state id = " + current_state_id);
 
-    get_state(state_id)
-      .then(state => {
-          data.state = state;
-      }, reason => {
-          res.send("Can't get state: " + reason);
-      })
-      .then(() => {
-          console.log("Getting answer stats.");
-          return get_answer_stats(state_id)
-      })
-      .then(answer_stats => {
-          console.log("Sending status.");
-          data.answers = answer_stats;
-
-          console.log("Status:");
-          console.log(data);
-
-          res.send(data);
-      }, reason => {
-          res.sendStatus(503);
-      });
+    Promise.all([
+      get_state(state_id),
+      get_answer_stats(state_id)
+    ])
+    .then(values => {
+      data = { state: values[0], answers: values[1] };
+      res.send(data);
+    })
+    .catch(err => {
+      console.log("Error getting data: " + err);
+      res.sendStatus(503);
+    });
 });
 
 server.post('/control/current_state', body_parser.json(), (req, res) => {
   console.log("Got request for new state:" + req.body.id);
-  id = req.body.id;
-  current_state_id = id;
+  current_state_id = req.body.id;
   res.sendStatus(200);
 });
 
 server.get('/data/state/current', function(req, res) {
-    console.log("Requested current state = " + current_state_id);
-    get_state(current_state_id).then(doc => {
-        console.log("Doc type:")
-        console.log(doc.constructor.name);
-        res.send(doc);
-    }, err => {
-      res.sendStatus(404);
+
+    if (!req.query) {
+      res.status(400).send("Missing query.");
+      return;
+    }
+    if (!req.query.user_id) {
+      res.status(400).send("Missing query: user_id.");
+      return;
+    }
+
+    var user_id = req.query.user_id;
+
+    console.log("Requested current state:"
+      + " state id = " + current_state_id
+      + ", user id = " + user_id);
+
+    Promise.all([
+      get_state(current_state_id),
+      get_answer(current_state_id, user_id)
+    ])
+    .then(values => {
+      var data = {};
+      data.state = values[0];
+      if (values[1])
+        data.selected_answer = values[1].answer;
+      res.send(data);
+    })
+    .catch(err => {
+      console.log("Error: " + err);
+      res.sendStatus(400);
     });
 });
 
@@ -100,15 +113,28 @@ server.post('/data/answer', body_parser.json(), (req, res) => {
   console.log(data);
   var collection = db.collection('answers');
   var dbData = { user: data.user, state: data.state, answer: data.answer };
-  collection.insertOne(dbData, {}, (error, result) => {
-    if (result != null) { res.sendStatus(200); }
-    else { res.sendStatus(503); }
-  });
+  collection.insertOne(dbData)
+    .then(() => {
+      res.sendStatus(200);
+    })
+    .catch(err => {
+      console.log("Error storing answer:");
+      console.log(err);
+      res.status(503).send(err);
+    });
 });
 
-function get_state(id) {
+function get_state(state_id) {
     var collection = db.collection('states');
-    return collection.findOne({_id: id}, {});
+    return collection.findOne({_id: state_id}, {});
+}
+
+function get_answer(state_id, user_id) {
+  var collection = db.collection('answers');
+  return collection.findOne({user: user_id, state: state_id});
+  /*return collection.findOne({user: user_id, state: state_id}, {}, (err,doc) => {
+    console.log("Doc: " + JSON.stringify(doc));
+  });*/
 }
 
 function get_answer_stats(state_id) {
@@ -126,8 +152,6 @@ function get_answer_stats(state_id) {
               stats[id] = count;
           });
           return stats;
-      }, reason => {
-        return null;
       });
 }
 
