@@ -1,7 +1,10 @@
 
+var login_url = '/static/html/user-login.html';
+
 user_id = sessionStorage.getItem('user_id');
+
 if (!user_id)
-  window.location = '/static/html/user-login.html'
+  window.location = login_url;
 
 window.onload = function() {
   loadState()
@@ -54,6 +57,12 @@ function submitAnswer() {
   http.send(JSON.stringify(answer));
 
   loadState();
+}
+
+function logOut() {
+  sessionStorage.removeItem('user_id');
+  user_id = undefined;
+  window.location = login_url;
 }
 
 function onHttpSuccess(http, f) {
